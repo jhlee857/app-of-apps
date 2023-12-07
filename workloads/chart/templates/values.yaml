@@ -1,0 +1,34 @@
+# Global Values
+repoUrl: 'https://github.com/aws-samples/eks-blueprints-add-ons.git'
+targetRevision: HEAD
+region: ''
+account: ''
+clusterName: ''
+destinationServer: ''
+argoNamespace: ''
+argoProject: ''
+
+labels:
+  env: dev
+# spec:
+#   destination:
+#     server: https://kubernetes.default.svc
+#   source:
+#     repoURL: https://gitlab.tde.sktelecom.com/IAC/hjh/sandbox-distro-ops-eks-workloads.git
+#     targetRevision: main
+
+
+#gateways:
+  # pri-gateway:
+  #   sourcePath: workloads/pri-gateway
+  # pub-gateway:
+  #   sourcePath: workloads/pub-gateway
+  #workloads-gateway:
+  #  sourcePath: workloads/workloads-gateway
+
+apps:
+  #### Test - leejoongho
+  test-httpd-sample:
+    sourcePath: workloads/test-httpd-sample
+  #test-canary-sample:
+  #  sourcePath: workloads/test-canary-sample
