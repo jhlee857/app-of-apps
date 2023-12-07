@@ -1,0 +1,252 @@
+{{- $currentScope := . }}
+{{- $stableServiceName := include "service-mesh-app.serviceName" . }}
+# ===============================
+# Process > Application (Rollout)
+# ===============================
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ include "service-mesh-app.fullname" . }}
+  labels:
+    {{- include "service-mesh-app.labels" . | nindent 4 }}
+    {{- with .Values.rollout.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "service-mesh-app.selectorLabels" . | nindent 6 }}
+      {{- with .Values.podSelectorLabels }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "service-mesh-app.selectorLabels" .| nindent 8 }}
+        {{- if and (hasKey .Values "istio") (.Values.istio.enabled) }}
+        sidecar.istio.io/inject: "true"
+        {{- end }}
+        {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+
+    spec:
+      serviceAccountName: {{ include "service-mesh-app.serviceAccountName" . }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        {{- if hasKey .Values.application "configFile" }}
+        {{- if hasKey .Values.application.configFile "podMountPath" }}
+        #? PLAIN PROPERTY-SCHEMA
+        - name: application-schema
+          {{- if hasKey .Values.application.configFile "localChartPath" }}
+          configMap:
+            name: {{ include "service-mesh-app.fullname" . }}-application-schema
+            items:
+              {{- range $path, $_ :=  .Files.Glob (printf "%s" .Values.application.configFile.localChartPath) }}
+              - key: {{ base $path }}
+                path: {{ base $path }}
+              {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.application.sensitiveMap }}
+        {{- range $index, $item := .Values.application.sensitiveMap }}
+        {{- if $item.injectWith.file }}
+        - name: "application-{{ $item.id }}-secret"
+          secret:
+            secretName: "{{ include "service-mesh-app.fullname" $currentScope }}-{{ $item.id }}-secret"
+        {{- end }}
+        {{- end }}
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if .Values.application.command }}
+          command:
+            {{- toYaml .Values.application.command | nindent 12 }}
+          {{- end }}
+          {{- if .Values.application.sensitiveMap }}
+          envFrom:
+            {{- range $index, $item := .Values.application.sensitiveMap }}
+            {{- if $item.injectWith.env }}
+            - secretRef:
+                name: "{{ include "service-mesh-app.fullname" $currentScope }}-{{ $item.id }}-secret" # TODO: application naming
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          env:
+            - name: SERVER_PORT
+              value: {{ .Values.application.containerPort | default 8080 | toString | quote }}
+            {{- if hasKey .Values.application "healthCheckPort" }}
+            - name: HEALTHCHECK_PORT
+              value: {{ .Values.application.healthCheckPort | default 38080 | toString | quote }}
+            {{- end }}
+            {{- if .Values.application.configFile }}
+            - name: CONFIG_FILE_PATH
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "service-mesh-app.fullname" . }}-application-plain-value
+                  key: podMountPath
+            {{- end }}
+            {{- if .Values.application.configMap }}
+            {{- range $key, $value := .Values.application.configMap }}
+            - name: {{ $key }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "service-mesh-app.fullname" $ }}-application-plain-value
+                  key: {{ $key }}
+            {{- end }}
+            {{- end }}
+            {{- range $key, $value := .Values.application.envFromfieldRefs }}
+            - name: {{ $key }}
+              valueFrom:
+                fieldRef:
+                  fieldPath: {{ $value }}
+            {{- end }}
+          volumeMounts:
+            {{- if hasKey .Values.application "configFile" }}
+            {{- if hasKey .Values.application.configFile "podMountPath" }}
+            - name: application-schema
+              readOnly: true
+              mountPath: {{ .Values.application.configFile.podMountPath | default "/config/app" }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.application.sensitiveMap }}
+            {{- range $index, $item := .Values.application.sensitiveMap }}
+            {{- if $item.injectWith.file }}
+            - name: "application-{{ $item.id }}-secret"
+              readOnly: true
+              mountPath: {{ $item.injectWith.path | default (printf "/mounted/secrets/%s" $item.id) }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+          {{- if hasKey .Values.application "resources" }}
+          resources:
+            {{- toYaml .Values.application.resources | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: app-port
+              containerPort: {{ .Values.application.containerPort | default 8080 }}
+              protocol: TCP
+            {{- if .Values.application.healthCheckPort }}
+            - name: status-port
+              containerPort: {{ .Values.application.healthCheckPort | default 8081 }}
+              protocol: TCP
+            {{- end }}
+          {{- if .Values.application.livenessProbe }}
+          livenessProbe:
+            {{- toYaml .Values.application.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.application.readinessProbe }}
+          readinessProbe:
+            {{- toYaml .Values.application.readinessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.application.startupProbe }}
+          startupProbe:
+            {{- toYaml .Values.application.startupProbe | nindent 12 }}
+          {{- end }}
+        {{- if hasKey .Values "sidecars" }}
+        {{- toYaml .Values.sidecars | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  strategy:
+    {{- if eq .Values.rollout.strategy "blueGreen" }}
+    blueGreen: 
+      activeService: {{ $stableServiceName }}
+      previewService: {{ $stableServiceName }}-preview
+      autoPromotionEnabled: {{ .Values.rollout.autoPromotionEnabled }}
+      {{- with .Values.rollout.autoPromotionSeconds }}
+      autoPromotionSeconds: {{ . }}
+      {{- end }}
+      {{- with .Values.rollout.antiAffinity }}
+      antiAffinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      maxUnavailable: {{ .Values.rollout.maxUnavailable | default 0 }}
+      {{- with .Values.rollout.prePromotionAnalysis }}
+      prePromotionAnalysis:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.rollout.postPromotionAnalysis }}
+      postPromotionAnalysis:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}      
+      scaleDownDelaySeconds: {{ .Values.rollout.scaleDownDelaySeconds | default 30 }}
+    {{- else if eq .Values.rollout.strategy "canary" }}
+    canary: 
+      steps:
+      {{- range $value := .Values.rollout.steps }}
+      {{- if $value.setWeight }}
+      - setWeight: {{ $value.setWeight }}
+      {{- if $value.pauseDuration }}
+      - pause: {duration: {{ $value.pauseDuration }}}
+      {{- else }}
+      - pause: {}
+      {{- end }}
+      {{- end }}
+      {{- with $value.setCanaryScale }}
+      - setCanaryScale:
+        {{- toYaml . | nindent 10 }}       
+      {{- end }}
+      {{- with $value.analysis }}
+      - analysis:
+        {{- toYaml . | nindent 10 }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.rollout.analysis }}
+      analysis:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      maxSurge: {{ .Values.rollout.maxSurge | default "25%" }}
+      maxUnavailable: {{ .Values.rollout.maxUnavailable | default "25%" }}
+      {{- if .Values.istio.enabled }}
+      {{- if .Values.rollout.trafficRouting }}
+      trafficRouting:
+        istio:
+          virtualService:
+            name: {{ $stableServiceName }}-vs
+          {{- if eq .Values.rollout.trafficRouting "subset" }}
+          destinationRule:
+            name: {{ $stableServiceName }}-destrule
+            canarySubsetName: preview
+            stableSubsetName: stable
+          {{- end }}
+      {{- if eq .Values.rollout.trafficRouting "service" }}    
+      stableService: {{ $stableServiceName }}
+      canaryService: {{ $stableServiceName }}-preview
+      {{- end }}   
+      {{- end }}
+      {{- end }}
+    {{- else }}
+    canary:
+      maxSurge: 1
+      maxUnavailable: 1
+    {{- end }}

@@ -1,0 +1,21 @@
+{{- if or (eq .Values.rollout.strategy "rolling") (eq .Values.rollout.trafficRouting "subset") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "service-mesh-app.serviceName" . }}
+  labels:
+    {{- include "service-mesh-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      {{- if hasKey .Values "application" }}
+      targetPort: {{ .Values.application.containerPort | default 8080 }}
+      {{- else }}
+      targetPort: http
+      {{- end }}
+      protocol: TCP
+      name: application
+  selector:
+    {{- include "service-mesh-app.selectorLabels" . | nindent 4 }}
+{{- end }}

@@ -1,0 +1,61 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "service-mesh-app.fullname" . }}
+  labels:
+    {{- include "service-mesh-app.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    {{- if eq .Values.autoscaling.targetRef "argo-rollout" }}
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
+    name: {{ include "service-mesh-app.fullname" . }}-rollout
+    {{- else }}
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "service-mesh-app.fullname" . }}
+    {{- end }}
+
+  {{- if .Values.autoscaling.minReplicas }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  {{- end }}
+
+  {{- if .Values.autoscaling.maxReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  {{- end }}
+
+  {{- if .Values.autoscaling.metrics }}
+  metrics:
+    {{- if .Values.autoscaling.metrics.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.metrics.targetMemoryUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.autoscaling.metrics.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.metrics.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.autoscaling.metrics.httpRequests }}
+    # FIXME!
+    - type: Object
+      object:
+        metric:
+          name: http-requests-per-second
+        describedObject:
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          name: {{ include "service-mesh-app.fullname" . }}
+        target:
+          type: Value
+          value: {{ .Values.autoscaling.metrics.httpRequests }}
+    {{- end }}
+  {{- end }}
+{{- end }}
