@@ -28,7 +28,7 @@ labels:
 
 apps:
   #### Test - leejoongho
-  test-httpd-sample:
+  spring-petclinic:
     sourcePath: workloads/spring-petclinic
   #test-canary-sample:
   #  sourcePath: workloads/test-canary-sample
