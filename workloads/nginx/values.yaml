@@ -40,7 +40,7 @@ service-mesh-app:
   # -- Istio 관련 기능
   istio:
     # -- Pod에 Istio Sidecar(Envoy) 주입
-    enabled: false
+    enabled: true
     # -- VirtualService 정보 업데이트 --> Istio VirtualService와 동일
     virtualService:
       # 해당 경로를 적용해야 하는 gateway 및 sidecar를 지정
