@@ -50,14 +50,12 @@ service-mesh-app:
         - "workloads-gateway"
       hosts:
         - "localhost"
-        # http:
-        #   # 디버깅 목적으로 경로에 할당된 이름
-        #   - name: primary
-        #     route:
-        #       - destination:
-        #           host: bff.workloads.svc.cluster.local
-        #           port:
-        #             number: 7001
+      http:
+      - route:
+        - destination:
+            host: details.workloads.svc.cluster.local
+            port:
+              number: 9080
     # destinationRule:
     #   host: mockup-web-frontend
     #   trafficPolicy:
