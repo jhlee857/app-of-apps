@@ -1,0 +1,45 @@
+# certificateArn: arn:aws:acm:ap-northeast-2:331182133186:certificate/d999ad52-c603-4b51-91b8-c7cad7b93fac
+# name: api-istio-ingressgateway-alb
+# getewayName: api-bookinfo-gateway
+# ingressGatewayName: api-gateway
+# rules:
+#   api-bookinfo.mate-technology.app:
+#     ingressGatewayName: api-gateway
+#     gateway:
+#       # certificateName: api-bookinfo-cert
+#       # credentialName: tls-secret
+#       name: https-api
+#       port: 443
+#       protocol: HTTPS
+
+# targetGroupBinding:
+#   targetGroupARN: arn:aws:elasticloadbalancing:ap-northeast-2:368374341312:targetgroup/istio-ingressgateway-tg/ba1f4a86281c1e89
+#   serviceRef:
+#     port: 80
+#   networking:
+#     ingress:
+#     - from:
+#       - securityGroup:
+#           groupID: sg-083c9ec37b6d02ce5 #ALB SG
+#       ports:
+#       - protocol: TCP
+
+
+# # ingress:
+# #   name: api-istio-ingressgateway-alb
+# #   certificateArn: arn:aws:acm:ap-northeast-2:331182133186:certificate/d999ad52-c603-4b51-91b8-c7cad7b93fac
+# #   class: alb
+# #   inboundCidrs: 100.64.0.0/21, 100.64.106.128/26, 192.168.52.192/26, 192.168.53.0/27, 116.123.217.99/32
+# #   rules:
+# #     api-bookinfo.mate-technology.app:
+# #       ingressGatewayName: api-gateway
+# #       gateway:
+# #         certificateName: api-bookinfo-cert
+# #         credentialName: tls-secret
+# #         name: https-api
+# #         port: 443
+# #         protocol: HTTPS
+
+# # gateway:
+# #   name: api-bookinfo-gateway
+# #   ingressGatewayName: api-gateway

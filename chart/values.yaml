@@ -18,17 +18,17 @@ labels:
 #     targetRevision: main
 
 
-#gateways:
+gateways:
   # pri-gateway:
   #   sourcePath: workloads/pri-gateway
   # pub-gateway:
   #   sourcePath: workloads/pub-gateway
-  #workloads-gateway:
-  #  sourcePath: workloads/workloads-gateway
+  workloads-gateway:
+    sourcePath: workloads/workloads-gateway
 
 apps:
   #### Test - leejoongho
-  spring-petclinic:
-    sourcePath: workloads/spring-petclinic
   product-page:
     sourcePath: workloads/product-page
+  reviews:
+    sourcePath: workloads/reviews

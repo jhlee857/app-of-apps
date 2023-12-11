@@ -1,0 +1,6 @@
+dependencies:
+- name: service-mesh-app
+  repository: file://../../common/gateway/
+  version: 0.1.0
+digest: sha256:bc2cdf448585f3f3514909213072e6800ec094687ed9598eafb3d2309fd2da72
+generated: "2023-12-11T15:33:33.538725+09:00"
