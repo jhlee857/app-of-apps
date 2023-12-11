@@ -74,19 +74,19 @@ service-mesh-app:
             prefix: /
         route:
         - destination:
-            host: productpage.workloads.svc.cluster.local
+            host: product-page.workloads.svc.cluster.local
             port:
               number: 9080
             subsets: v1
           weight: 50
         - destination:
-            host: productpage.workloads.svc.cluster.local
+            host: product-page.workloads.svc.cluster.local
             port:
               number: 9080
             subsets: v2
           weight: 50
     destinationRule:
-      host: productpage.workloads.svc.cluster.local
+      host: product-page.workloads.svc.cluster.local
       subsets:
       - name: v1
         labels:
