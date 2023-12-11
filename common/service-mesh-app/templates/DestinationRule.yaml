@@ -1,0 +1,43 @@
+{{- if and (hasKey .Values "istio") (.Values.istio.enabled) }}
+{{- if or (.Values.istio.destinationRule) (eq .Values.rollout.trafficRouting "subset") }}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "service-mesh-app.serviceName" . }}-destrule
+spec:
+  {{- if .Values.istio.destinationRule.host }}
+  host: {{ .Values.istio.destinationRule.host }}
+  {{- else }}
+  host: {{ include "service-mesh-app.serviceName" . }}
+  {{- end }}
+  {{- with .Values.istio.destinationRule.trafficPolicy }}
+  trafficPolicy:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- if eq .Values.rollout.strategy "canary" }}
+  subsets:
+  - name: stable
+    labels:
+      {{- include "service-mesh-app.selectorLabels" . | nindent 6 }}
+  - name: preview
+    labels:
+      {{- include "service-mesh-app.selectorLabels" . | nindent 6 }}
+  {{- with .Values.istio.destinationRule.subsets }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- else }}
+  {{- with .Values.istio.destinationRule.subsets }}
+  subsets:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.istio.destinationRule.workloadSelector }}
+  workloadSelector:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- with .Values.istio.destinationRule.exportTo }}
+  exportTo:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+{{- end }}
+{{- end }}
