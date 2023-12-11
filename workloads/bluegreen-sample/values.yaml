@@ -24,7 +24,7 @@ service-mesh-app:
     readinessProbe:
       httpGet:
         path: "/"
-        port: 80
+        port: 8080
         initialDelaySeconds: 5
         periodSeconds: 5
     # -- Pod에 환경변수로 넣어줄 추가 정보 - Configmap 에 생성되며 해당 Configmap을 참조합니다. 
