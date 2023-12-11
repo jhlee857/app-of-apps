@@ -58,7 +58,7 @@ service-mesh-app:
               number: 80
         match:
         - uri:
-            prefix: "/"
+            prefix: "/nginx"
         rewrite:
           uri: "/"
 
