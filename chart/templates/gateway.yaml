@@ -1,0 +1,32 @@
+{{- range $name, $value := .Values.gateways }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $name }}
+  namespace: {{ $.Values.argoNamespace | default "argocd" }}
+  labels:
+    {{- toYaml $.Values.labels | nindent 4 }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ $.Values.argoProject | default "default" }}
+  source:
+    repoURL: {{ $.Values.repoUrl }}
+    targetRevision: {{ $.Values.targetRevision }}
+    path: {{ $value.sourcePath }}
+    helm:
+      valueFiles: 
+        - values.yaml
+      parameters:
+      - name: service-mesh-gateway.env
+        value: {{ $.Values.labels.dev | default "dev" }}
+  destination:
+    namespace: workloads
+    server: {{ $.Values.destinationServer | default "https://kubernetes.default.svc" }}
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+    - CreateNamespace=true
+{{- end -}}

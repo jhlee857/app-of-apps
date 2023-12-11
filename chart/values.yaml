@@ -19,17 +19,17 @@ labels:
 
 
 gateways:
-  # pri-gateway:
-  #   sourcePath: workloads/pri-gateway
+   pri-gateway:
+     sourcePath: workloads/gateway
   # pub-gateway:
   #   sourcePath: workloads/pub-gateway
-  workloads-gateway:
-    sourcePath: workloads/workloads-gateway
+  #workloads-gateway:
+  #  sourcePath: workloads/workloads-gateway
 
 apps:
   #### Test - leejoongho
-  gateway:
-    sourcePath: workloads/gateway
+  #gateway:
+  #  sourcePath: workloads/gateway
   product-page:
     sourcePath: workloads/product-page
   reviews:
