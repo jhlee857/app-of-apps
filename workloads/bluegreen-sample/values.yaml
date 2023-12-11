@@ -55,7 +55,6 @@ service-mesh-app:
       - "workloads-gateway"
       hosts:
         - "bg-sample.localhost"
-        - "*"
       http:
       - route:
         - destination:
