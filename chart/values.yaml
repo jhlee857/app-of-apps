@@ -30,3 +30,6 @@ apps:
   #### Test - leejoongho
   nginx:
     sourcePath: workloads/nginx
+  bluegreen-sample:
+    sourcePath: workloads/bluegreen-sample
+
