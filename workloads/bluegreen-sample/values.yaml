@@ -45,6 +45,7 @@ service-mesh-app:
     #  }
     #ad.datadoghq.com/istio-proxy.logs: '[{"source": "istio-proxy","service": "bluegreen-sample","tags": ["env:dev"]}]'
     #ad.datadoghq.com/service-mesh-app.logs: '[{"source": "service-mesh-app","service": "bluegreen-sample","tags": ["env:dev"]}]'
+    sidecar.istio.io/rewriteAppHTTPProbers: "false"
 
   service:
     type: ClusterIP
