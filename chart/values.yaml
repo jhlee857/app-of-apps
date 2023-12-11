@@ -28,6 +28,8 @@ gateways:
 
 apps:
   #### Test - leejoongho
+  gateway:
+    sourcePath: workloads/gateway
   product-page:
     sourcePath: workloads/product-page
   reviews:
