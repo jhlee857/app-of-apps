@@ -56,17 +56,17 @@ service-mesh-app:
       hosts:
         - "bg-sample.localhost"
         - "*"
-      #http:
-      #- route:
-      #  - destination:
-      #      host: "bluegreen-sample.workloads.svc.cluster.local"
-      #      port:
-      #        number: 80
-      #  match:
-      #  - uri:
-      #      prefix: "/"
-      #  rewrite:
-      #    uri: "/"
+      http:
+      - route:
+        - destination:
+            host: "bluegreen-sample.workloads.svc.cluster.local"
+            port:
+              number: 80
+        match:
+        - uri:
+            prefix: "/"
+        rewrite:
+          uri: "/"
 
   rollout:
     strategy: "blueGreen"
