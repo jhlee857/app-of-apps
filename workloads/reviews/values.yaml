@@ -7,7 +7,7 @@ service-mesh-app:
   replicaCount: 1
   # -- 이미지 정보
   image:
-    repository: docker.io/istio/examples-bookinfo-reviews-v1:1.18.0
+    repository: docker.io/istio/examples-bookinfo-reviews-v1
     imagePullPolicy: IfNotPresent
     tag: 1.18.0
   serviceAccount:
