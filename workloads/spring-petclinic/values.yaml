@@ -7,9 +7,9 @@ service-mesh-app:
   replicaCount: 1
   # -- 이미지 정보
   image:
-    repository: sample-app:0.1
+    repository: sample-app
     imagePullPolicy: Never
-    #tag: 2.4.17
+    tag: 0.1
   serviceAccount:
     # Specifies whether a service account should be created
     create: true
