@@ -36,3 +36,5 @@ apps:
     sourcePath: workloads/reviews
   ratings:
     sourcePath: workloads/ratings
+  details:
+    sourcePath: workloads/details
