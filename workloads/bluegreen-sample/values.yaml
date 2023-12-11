@@ -10,7 +10,7 @@ service-mesh-app:
     repository: argoproj/rollouts-demo
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "blue"
+    tag: "green"
   # -- 애플리케이션 관련 설정
   application:
     # -- 애플리케이션 포트
@@ -21,10 +21,12 @@ service-mesh-app:
     #    path: "/"
     #    port: 80
     # -- 서비스에 Pod를 추가하기 위한 ReadinessProbe
-    #readinessProbe:
-    #  httpGet:
-    #    path: "/"
-    #    port: 80
+    readinessProbe:
+      httpGet:
+        path: "/"
+        port: 80
+        initialDelaySeconds: 5
+        periodSeconds: 5
     # -- Pod에 환경변수로 넣어줄 추가 정보 - Configmap 에 생성되며 해당 Configmap을 참조합니다. 
     #configMap:
     #  PROFILE: "SSP-WEB-SKTWEB-NEW"
