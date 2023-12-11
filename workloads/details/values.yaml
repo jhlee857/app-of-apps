@@ -49,11 +49,11 @@ service-mesh-app:
       gateways:
         - "workloads-gateway"
       hosts:
-        - "localhost"
+        - "*"
       http:
       - route:
         - destination:
-            host: details.workloads.svc.cluster.local
+            host: "details.workloads.svc.cluster.local"
             port:
               number: 9080
     # destinationRule:
