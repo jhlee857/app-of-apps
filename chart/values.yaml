@@ -18,9 +18,9 @@ labels:
 #     targetRevision: main
 
 
-gateways:
-   pri-gateway:
-     sourcePath: workloads/gateway
+#gateways:
+#   pri-gateway:
+#     sourcePath: workloads/gateway
   # pub-gateway:
   #   sourcePath: workloads/pub-gateway
   #workloads-gateway:
