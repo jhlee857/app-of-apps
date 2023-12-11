@@ -1,6 +1,6 @@
 dependencies:
-- name: service-mesh-app
+- name: gateway
   repository: file://../../common/gateway/
   version: 0.1.0
-digest: sha256:bc2cdf448585f3f3514909213072e6800ec094687ed9598eafb3d2309fd2da72
-generated: "2023-12-11T15:33:33.538725+09:00"
+digest: sha256:0550ea82d997d2ef0c152a953bdf9dd1da632759a05273ac98cc35b1b8f26b36
+generated: "2023-12-11T15:35:51.104742+09:00"
