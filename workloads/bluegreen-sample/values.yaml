@@ -63,7 +63,7 @@ service-mesh-app:
               number: 80
         match:
         - uri:
-            prefix: "/bg"
+            prefix: "/"
         rewrite:
           uri: "/"
 
