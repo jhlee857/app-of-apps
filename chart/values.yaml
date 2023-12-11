@@ -28,15 +28,5 @@ labels:
 
 apps:
   #### Test - leejoongho
-  #gateway:
-  #  sourcePath: workloads/gateway
-  product-page:
-    sourcePath: workloads/product-page
-  reviews:
-    sourcePath: workloads/reviews
-  ratings:
-    sourcePath: workloads/ratings
-  details:
-    sourcePath: workloads/details
   nginx:
     sourcePath: workloads/nginx
