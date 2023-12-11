@@ -64,8 +64,8 @@ service-mesh-app:
         match:
         - uri:
             prefix: "/bg"
-        rewrite:
-          uri: "/bg"
+        #rewrite:
+        #  uri: "/"
 
   rollout:
     strategy: "blueGreen"
