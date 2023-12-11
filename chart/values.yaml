@@ -34,3 +34,5 @@ apps:
     sourcePath: workloads/product-page
   reviews:
     sourcePath: workloads/reviews
+  ratings:
+    sourcePath: workloads/ratings
