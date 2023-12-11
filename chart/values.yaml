@@ -30,5 +30,5 @@ apps:
   #### Test - leejoongho
   spring-petclinic:
     sourcePath: workloads/spring-petclinic
-  #test-canary-sample:
-  #  sourcePath: workloads/test-canary-sample
+  product-page:
+    sourcePath: workloads/product-page

@@ -1,0 +1,93 @@
+{{- if and (hasKey .Values "istio") (.Values.istio.enabled) }}
+{{- if .Values.istio.virtualService }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "service-mesh-app.serviceName" . }}-vs
+  labels:
+    {{- include "service-mesh-app.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.istio.virtualService.gateways }}
+  gateways:
+  {{- range $key, $gateway := .Values.istio.virtualService.gateways }}
+  - {{ $gateway | quote}}
+  {{- end }}
+  {{- end }}
+  hosts:
+  {{- if .Values.istio.virtualService.hosts }}
+  {{- range $key, $host := .Values.istio.virtualService.hosts }}
+  - {{ $host | quote }}
+  {{- end }}
+  {{- else }}
+  - {{ printf "*.%s.svc.cluster.local" .Release.Namespace }}
+  {{- end }}
+  http:
+  {{- if .Values.istio.virtualService.http }}
+  {{- with .Values.istio.virtualService.http }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- else }}
+  {{- if eq .Values.rollout.strategy "blueGreen" }}
+  - route:
+    - destination:
+        host: {{ include "service-mesh-app.serviceName" . }}
+        port:
+          number: {{ .Values.service.port | default 80 }}         
+      weight: {{ .Values.rollout.stableWeight | default 100 }}
+    - destination:
+        host: {{ include "service-mesh-app.previewServiceName" . }}
+        port:
+          number: {{ .Values.service.port | default 80 }}        
+      weight: {{ .Values.rollout.previewWeight | default 0 }}
+  {{- else if and (eq .Values.rollout.strategy "canary") (eq .Values.rollout.trafficRouting "service") }}
+  - route:
+    - destination:
+        host: {{ include "service-mesh-app.serviceName" . }}
+        port:
+          number: {{ .Values.service.port | default 80 }}         
+      weight: 100
+    - destination:
+        host: {{ include "service-mesh-app.previewServiceName" . }}
+        port:
+          number: {{ .Values.service.port | default 80 }}        
+      weight: 0
+  {{- else if and (eq .Values.rollout.strategy "canary") (eq .Values.rollout.trafficRouting "subset") }}
+  - route:
+    - destination:
+        host: {{ include "service-mesh-app.serviceName" . }}
+        subset: stable
+        port:
+          number: {{ .Values.service.port | default 80 }}      
+      weight: 100
+    - destination:
+        host: {{ include "service-mesh-app.serviceName" . }}
+        subset: preview
+        port:
+          number: {{ .Values.service.port | default 80 }}         
+      weight: 0
+  {{- else }}
+  - route:
+    - destination:
+        host: {{ include "service-mesh-app.serviceName" . }}
+        port:
+          number: {{ .Values.service.port | default 80 }}      
+      weight: 100
+  {{- end }}
+  {{- end }}
+
+  {{- with .Values.istio.virtualService.tls }}
+  tls:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+
+  {{- with .Values.istio.virtualService.tcp }}
+  tcp:
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+
+  {{- with .Values.istio.virtualService.exportTo }}
+  exportTo:
+  {{- toYaml . | nindent 2 }}
+  {{- end }} 
+{{- end }}
+{{- end }}
