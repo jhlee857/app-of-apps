@@ -1,0 +1,81 @@
+service-mesh-app:
+  # -- workload(App) 이름
+  fullnameOverride: "nginx"
+  # -- 차트 이름(없을 경우 Chart.yaml의 name field가 default)
+  nameOverride: "nginx"
+  # -- 레플리케이션 Pod 갯수
+  replicaCount: 1
+  # -- 이미지 정보
+  image:
+    repository: nginx
+    imagePullPolicy: IfNotPresent
+    tag: 1.14.2
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    #annotations:
+    #  eks.amazonaws.com/role-arn: arn:aws:iam::613674257311:role/service-role/applications3Role-role-app-s3
+  # -- 애플리케이션 관련 설정
+  application:
+    # -- 애플리케이션 포트
+    containerPort: 80
+    # -- Pod 헬스체크를 위한 LivenessProbe
+    #livenessProbe:
+    #  httpGet:
+    #    path: "/"
+    #    port: 9080
+    # -- 서비스에 Pod를 추가하기 위한 ReadinessProbe
+    #readinessProbe:
+    #  httpGet:
+    #    path: "/"
+    #    port: 9080
+        # -- Pod에 환경변수로 넣어줄 추가 정보 - Configmap 에 생성되며 해당 Configmap을 참조
+        # configMap:
+        #   PROFILE: "SSP-WEB"
+        #   COLOR: "#333333"
+        #   SKIP_NODE_NAME: "ip-10-202-21-160.ap-northeast-2.compute.internal"
+        # envFromfieldRefs:
+        #   NODE_NAME: "spec.nodeName"
+  # -- Istio 관련 기능
+  istio:
+    # -- Pod에 Istio Sidecar(Envoy) 주입
+    enabled: true
+    # -- VirtualService 정보 업데이트 --> Istio VirtualService와 동일
+    virtualService:
+      # 해당 경로를 적용해야 하는 gateway 및 sidecar를 지정
+      # 이 필드를 생략하면 mesh의 모든 sidecar에 규칙을 적용하는 "mesh"(default gateway)가 사용됨
+      # Gateway와 sidecar 모두에 규칙을 적용하려면 gateway 이름 중 하나로 "mesh"를 지정
+      gateways:
+        - "workloads-gateway"
+      hosts:
+        - "*"
+      http:
+      - route:
+        - destination:
+            host: "nginx.workloads.svc.cluster.local"
+            port:
+              number: 80
+    # destinationRule:
+    #   host: mockup-web-frontend
+    #   trafficPolicy:
+    #     outlierDetection:
+    #       interval: 1s
+    #       consecutive5xxErrors: 5
+    #       baseEjectionTime: 3m
+    #       maxEjectionPercent: 100
+# -- Argo Rollout 을 사용한 배포 전략을 정의합니다. (참고: https://argo-rollouts.readthedocs.io/en/stable/)
+  rollout:
+    strategy: "blueGreen"
+    trafficRouting: "service"
+    #stableWeight: 100
+    #previewWeight: 0
+    activeService: ""
+    previewService: ""
+    autoPromotionEnabled: false
+    autoPromotionSeconds: {}
+    antiAffinity: {}
+    maxUnavailable: 0
+    prePromotionAnalysis: {}
+    postPromotionAnalysis: {}
+    scaleDownDelaySeconds: 30

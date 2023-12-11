@@ -38,3 +38,5 @@ apps:
     sourcePath: workloads/ratings
   details:
     sourcePath: workloads/details
+  nginx:
+    sourcePath: workloads/nginx
