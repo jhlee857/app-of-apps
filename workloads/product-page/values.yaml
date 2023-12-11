@@ -77,23 +77,6 @@ service-mesh-app:
             host: product-page.workloads.svc.cluster.local
             port:
               number: 9080
-            subsets: v1
-          weight: 50
-        - destination:
-            host: product-page.workloads.svc.cluster.local
-            port:
-              number: 9080
-            subsets: v2
-          weight: 50
-    destinationRule:
-      host: product-page.workloads.svc.cluster.local
-      subsets:
-      - name: v1
-        labels:
-          version: v1
-      - name: v2
-        labels:
-          version: v2
     # destinationRule:
     #   host: mockup-web-frontend
     #   trafficPolicy:
