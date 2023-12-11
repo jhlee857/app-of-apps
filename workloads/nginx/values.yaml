@@ -20,16 +20,15 @@ service-mesh-app:
   application:
     # -- 애플리케이션 포트
     containerPort: 80
-    # -- Pod 헬스체크를 위한 LivenessProbe
-    #livenessProbe:
-    #  httpGet:
-    #    path: "/"
-    #    port: 9080
+    livenessProbe:
+      httpGet:
+        path: "/"
+        port: 80
     # -- 서비스에 Pod를 추가하기 위한 ReadinessProbe
-    #readinessProbe:
-    #  httpGet:
-    #    path: "/"
-    #    port: 9080
+    readinessProbe:
+      httpGet:
+        path: "/"
+        port: 80
         # -- Pod에 환경변수로 넣어줄 추가 정보 - Configmap 에 생성되며 해당 Configmap을 참조
         # configMap:
         #   PROFILE: "SSP-WEB"
@@ -37,15 +36,9 @@ service-mesh-app:
         #   SKIP_NODE_NAME: "ip-10-202-21-160.ap-northeast-2.compute.internal"
         # envFromfieldRefs:
         #   NODE_NAME: "spec.nodeName"
-  # -- Istio 관련 기능
   istio:
-    # -- Pod에 Istio Sidecar(Envoy) 주입
     enabled: true
-    # -- VirtualService 정보 업데이트 --> Istio VirtualService와 동일
     virtualService:
-      # 해당 경로를 적용해야 하는 gateway 및 sidecar를 지정
-      # 이 필드를 생략하면 mesh의 모든 sidecar에 규칙을 적용하는 "mesh"(default gateway)가 사용됨
-      # Gateway와 sidecar 모두에 규칙을 적용하려면 gateway 이름 중 하나로 "mesh"를 지정
       gateways:
         - "workloads-gateway"
       hosts:

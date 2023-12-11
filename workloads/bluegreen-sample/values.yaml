@@ -1,0 +1,85 @@
+## values.yaml
+# Default values for service-mesh-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+service-mesh-app:
+  fullnameOverride: "bluegreen-sample"
+  nameOverride: "bluegreen-sample"
+  replicaCount: 1
+  image:
+    repository: argoproj/rollouts-demo
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "blue"
+  # -- 애플리케이션 관련 설정
+  application:
+    # -- 애플리케이션 포트
+    containerPort: 8080
+    # -- Pod 헬스체크를 위한 LivenessProbe
+    #livenessProbe:
+    #  httpGet:
+    #    path: "/"
+    #    port: 80
+    # -- 서비스에 Pod를 추가하기 위한 ReadinessProbe
+    #readinessProbe:
+    #  httpGet:
+    #    path: "/"
+    #    port: 80
+    # -- Pod에 환경변수로 넣어줄 추가 정보 - Configmap 에 생성되며 해당 Configmap을 참조합니다. 
+    #configMap:
+    #  PROFILE: "SSP-WEB-SKTWEB-NEW"
+    #  COLOR: "#333333"
+  
+  podAnnotations:
+    #ad.datadoghq.com/istio-proxy.checks: |
+    #  {
+    #    "istio-proxy-int": {
+    #      "init_config": {},
+    #      "instances": [{
+    #       "istiod_endpoint": "http://%%host%%:15014/metrics",
+    #       "use_openmetrics": "true"
+    #      }]
+    #    }
+    #  }
+    #ad.datadoghq.com/istio-proxy.logs: '[{"source": "istio-proxy","service": "bluegreen-sample","tags": ["env:dev"]}]'
+    #ad.datadoghq.com/service-mesh-app.logs: '[{"source": "service-mesh-app","service": "bluegreen-sample","tags": ["env:dev"]}]'
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  istio:
+    enabled: true
+    virtualService:
+      gateways:
+      - "workloads-gateway"
+      hosts:
+        - "*"
+      http:
+      - route:
+        - destination:
+            host: "bluegreen-sample.workloads.svc.cluster.local"
+            port:
+              number: 80
+        match:
+        - uri:
+            prefix: "/bg"
+        rewrite:
+          uri: "/"
+
+  rollout:
+    strategy: "blueGreen"
+    trafficRouting: "service"
+    #stableWeight: 100
+    #previewWeight: 0
+    activeService: ""
+    previewService: ""
+    autoPromotionEnabled: false
+    autoPromotionSeconds: {}
+    antiAffinity: {}
+    maxUnavailable: 0
+    prePromotionAnalysis: {}
+    postPromotionAnalysis: {}
+    scaleDownDelaySeconds: 30
+
+
