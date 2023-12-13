@@ -4,7 +4,7 @@ service-mesh-app:
   # -- 차트 이름(없을 경우 Chart.yaml의 name field가 default)
   nameOverride: "nginx"
   # -- 레플리케이션 Pod 갯수
-  replicaCount: 1
+  replicaCount: 10
   # -- 이미지 정보
   image:
     repository: nginx
