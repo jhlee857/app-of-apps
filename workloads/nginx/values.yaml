@@ -44,7 +44,7 @@ service-mesh-app:
       gateways:
         - "workloads-gateway"
       hosts:
-        - "*"
+        - "nginx.localhost"
       http:
       - route:
         - destination:
