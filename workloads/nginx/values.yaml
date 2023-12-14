@@ -44,7 +44,7 @@ service-mesh-app:
       gateways:
         - "workloads-gateway"
       hosts:
-        - "nginx.localhost"
+        - "localhost"
       http:
       - route:
         - destination:
@@ -53,7 +53,7 @@ service-mesh-app:
               number: 80
         match:
         - uri:
-            prefix: "/"
+            prefix: "/nginx"
         rewrite:
           uri: "/"
 
