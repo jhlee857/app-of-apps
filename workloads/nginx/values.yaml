@@ -55,7 +55,7 @@ service-mesh-app:
         - uri:
             prefix: "/nginx"
         rewrite:
-          uri: "/nginx"
+          uri: "/"
 
     # destinationRule:
     #   host: mockup-web-frontend
