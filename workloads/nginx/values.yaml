@@ -51,11 +51,11 @@ service-mesh-app:
             host: "nginx.workloads.svc.cluster.local"
             port:
               number: 80
-        match:
-        - uri:
-            prefix: "/"
-        rewrite:
-          uri: "/"
+        #match:
+        #- uri:
+        #    prefix: "/"
+        #rewrite:
+        #  uri: "/"
 
     # destinationRule:
     #   host: mockup-web-frontend
