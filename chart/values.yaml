@@ -32,4 +32,6 @@ apps:
     sourcePath: workloads/nginx
   bluegreen-sample:
     sourcePath: workloads/bluegreen-sample
+  python-sample:
+    sourcePath: workloads/python-sample
 

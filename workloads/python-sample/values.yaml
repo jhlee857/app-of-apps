@@ -1,0 +1,82 @@
+service-mesh-app:
+  # -- workload(App) 이름
+  fullnameOverride: "python"
+  # -- 차트 이름(없을 경우 Chart.yaml의 name field가 default)
+  nameOverride: "python"
+  # -- 레플리케이션 Pod 갯수
+  replicaCount: 1
+  # -- 이미지 정보
+  image:
+    repository: python-test
+    imagePullPolicy: Never
+    tag: 0.1
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    #annotations:
+    #  eks.amazonaws.com/role-arn: arn:aws:iam::613674257311:role/service-role/applications3Role-role-app-s3
+  # -- 애플리케이션 관련 설정
+  application:
+    # -- 애플리케이션 포트
+    containerPort: 9090
+    #livenessProbe:
+    #  httpGet:
+    #    path: "/"
+    #    port: 80
+    # -- 서비스에 Pod를 추가하기 위한 ReadinessProbe
+    #readinessProbe:
+    #  httpGet:
+    #    path: "/"
+    #    port: 9090
+    #    initialDelaySeconds: 5
+    #    periodSeconds: 5
+    #    # -- Pod에 환경변수로 넣어줄 추가 정보 - Configmap 에 생성되며 해당 Configmap을 참조
+    #    # configMap:
+    #    #   PROFILE: "SSP-WEB"
+    #    #   COLOR: "#333333"
+    #    #   SKIP_NODE_NAME: "ip-10-202-21-160.ap-northeast-2.compute.internal"
+    #    # envFromfieldRefs:
+    #    #   NODE_NAME: "spec.nodeName"
+  istio:
+    enabled: true
+    virtualService:
+      gateways:
+        - "workloads-gateway"
+      hosts:
+        - "*"
+      http:
+      - route:
+        - destination:
+            host: "python-sample.workloads.svc.cluster.local"
+            port:
+              number: 9090
+        match:
+        - uri:
+            prefix: "/python"
+        rewrite:
+          uri: "/"
+
+    # destinationRule:
+    #   host: mockup-web-frontend
+    #   trafficPolicy:
+    #     outlierDetection:
+    #       interval: 1s
+    #       consecutive5xxErrors: 5
+    #       baseEjectionTime: 3m
+    #       maxEjectionPercent: 100
+# -- Argo Rollout 을 사용한 배포 전략을 정의합니다. (참고: https://argo-rollouts.readthedocs.io/en/stable/)
+  rollout:
+    strategy: "blueGreen"
+    trafficRouting: "service"
+    #stableWeight: 100
+    #previewWeight: 0
+    activeService: ""
+    previewService: ""
+    autoPromotionEnabled: false
+    autoPromotionSeconds: {}
+    antiAffinity: {}
+    maxUnavailable: 0
+    prePromotionAnalysis: {}
+    postPromotionAnalysis: {}
+    scaleDownDelaySeconds: 30
