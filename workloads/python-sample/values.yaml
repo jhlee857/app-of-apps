@@ -48,9 +48,9 @@ service-mesh-app:
       http:
       - route:
         - destination:
-            host: "python-sample.workloads.svc.cluster.local"
+            host: "python.workloads.svc.cluster.local"
             port:
-              number: 9090
+              number: 80
         match:
         - uri:
             prefix: "/python"
