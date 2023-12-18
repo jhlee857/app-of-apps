@@ -5,7 +5,7 @@ success_cnt=0
 failed_cnt=0
 for i in $SET
 do
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "nginx.localhost:9080")
+STATUS=$(curl -s -o /dev/null -w "%{http_code}" "localhost:9080/python")
 
 if [ $STATUS -eq 200 ]; then
   echo $STATUS
