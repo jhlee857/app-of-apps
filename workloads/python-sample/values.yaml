@@ -4,7 +4,7 @@ service-mesh-app:
   # -- 차트 이름(없을 경우 Chart.yaml의 name field가 default)
   nameOverride: "python"
   # -- 레플리케이션 Pod 갯수
-  replicaCount: 5
+  replicaCount: 1
   # -- 이미지 정보
   image:
     repository: python-test
