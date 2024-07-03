@@ -9,7 +9,7 @@ service-mesh-app:
   image:
     repository: python-prod
     imagePullPolicy: Never
-    tag: v1
+    tag: 0.1
   serviceAccount:
     # Specifies whether a service account should be created
     create: true
@@ -19,7 +19,7 @@ service-mesh-app:
   # -- 애플리케이션 관련 설정
   application:
     # -- 애플리케이션 포트
-    containerPort: 80
+    containerPort: 8090
     #livenessProbe:
     #  httpGet:
     #    path: "/"
