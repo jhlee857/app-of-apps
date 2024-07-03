@@ -34,4 +34,6 @@ apps:
     sourcePath: workloads/bluegreen-sample
   python-sample:
     sourcePath: workloads/python-sample
+  python-prod:
+    sourcePath: workloads/python-prod
 
