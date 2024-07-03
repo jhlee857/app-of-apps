@@ -19,7 +19,7 @@ service-mesh-app:
   # -- 애플리케이션 관련 설정
   application:
     # -- 애플리케이션 포트
-    containerPort: 9090
+    containerPort: 5000
     #livenessProbe:
     #  httpGet:
     #    path: "/"
